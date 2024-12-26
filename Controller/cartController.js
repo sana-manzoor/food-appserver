@@ -1,35 +1,115 @@
-const cartitems=require('../Models/cartSchema')
+const carts=require('../Models/cartSchema')
 
-
-exports.addtoCart=async (req, res) => {
-    console.log("Inside addtocart Function!!")
-    // console.log(req.file.filename)
-    const { title, quantity, price, total, userId,itemId} = req.body
-    console.log(`${title},${quantity},${price},${total},${userId},${itemId}`)
-    //  const food_image=req.file.filename
-    //  res.send("addtocart request is hit!!")
-    // try{
-    //     const excistingFood=await fooditems.findOne({description})
-    //     if(excistingFood){
-    //         res.status(406).json("Excisting Food")
-    //     }
-    //     else{
-    //         const newFooditem=new fooditems({title,price,category,description,food_image,userId})
-    //         await newFooditem.save()
-    //         res.status(200).json(newFooditem)
-    //     }
-    // }
-    // catch(err){
-    //     res.status(401).json("Something Went Wrong!! " + err)
-    // }
+exports.addtoCart=async(req,res)=>{
+    console.log("inside addtocart")
+    const {pid,title,price,category,food_image,uid}=req.body
+    console.log(`${pid},${title},${category},${uid}`)
+    
     try{
-       
-            const cartItem=new cartitems({title,quantity,price,total,userId,itemId})
-            await cartItem.save()
-            res.status(200).json(cartItem)
-        
+        const excistingProduct=await carts.findOne({pid,uid})
+        if(excistingProduct){
+            res.status(406).json("Product already excists in wishlist")
+        }
+        else{
+            const newItem=new carts({pid,title,price,category,food_image,quantity:"1",total:"",uid})
+            await newItem.save()
+            res.status(201).json(newItem)
+        }
     }
     catch(err){
-        res.status(401).json("Something Went Wrong!! " + err)
+        res.status(404).json(err)
+    }
+
+    
+}
+
+exports.getcartlist = async (req, res) => {
+    const { id } = req.params
+    console.log(id)
+    try {
+        console.log("inside view cart")
+        const result = await carts.find({ uid: id })
+        console.log(result)
+        res.status(200).json(result)
+    }
+    catch (err) {
+        res.status(401).json(err)
+        console.log(err)
     }
 }
+
+exports.deleteallcart=async(req,res)=>{
+    console.log("Inside allcartdelete")
+    // res.send("userslist")
+    const {id}=req.params
+    try {
+        const data = await carts.deleteMany({uid:id})
+        console.log(data)
+        res.status(200).json(data)
+
+    }
+    catch (err) {
+        res.status(401).json(err)
+    }
+}
+
+
+exports.deletecart= async (req, res) => {
+    console.log("Inside cartdelete")
+    // res.send("userslist")
+    const {id}=req.params
+    try {
+        const data = await carts.findByIdAndDelete({_id:id})
+        console.log(data)
+        res.status(200).json(data)
+
+    }
+    catch (err) {
+        res.status(401).json(err)
+    }
+ }
+
+
+ exports.incCartQuantity=async(req,res)=>{
+    // const {quantity}=req.body
+    // console.log(quantity)
+    console.log("Inside cartincrease")
+    try{
+        const {id}=req.params
+        console.log(id)
+        const excistingProduct=await carts.findOne({_id: id})
+        console.log(excistingProduct)
+        excistingProduct.quantity++
+        excistingProduct.total=excistingProduct.price * excistingProduct.quantity
+        await excistingProduct.save()
+        res.status(200).json(excistingProduct)
+    }
+    catch(err){
+        res.status(401).json(err)
+    }
+}
+
+
+
+exports.decQuantity=async(req,res)=>{
+    console.log("Inside cart decrease")
+    try{
+        const {id}=req.params
+        const excistingProduct=await carts.findOne({_id: id})
+        excistingProduct.quantity--
+        if(excistingProduct.quantity==0){
+            const result=await carts.findOneAndDelete({_id:id})
+            res.status(200).json("Item Deleted by Quantity 0")
+        }
+        else{
+            excistingProduct.total=excistingProduct.price * excistingProduct.quantity
+            await excistingProduct.save()
+            res.status(200).json(excistingProduct)
+        }
+
+    }
+    catch(err){
+        res.status(401).json(err)
+    }
+}
+

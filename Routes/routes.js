@@ -6,6 +6,7 @@ const express=require('express')
 const usercontroller=require('../Controller/userController')
 const foodController=require('../Controller/foodController')
 const cartController=require('../Controller/cartController')
+const orderController=require('../Controller/orderController')
 
 
 
@@ -34,8 +35,15 @@ router.post('/user/addtocart',cartController.addtoCart)
 router.get('/admin/getcategory',foodController.getCategory)
 
 
-
-
+//cart functionalities
+router.post('/addcart',cartController.addtoCart)
+ router.get('/cartlist/:id',cartController.getcartlist)
+ router.delete('/delcart/:id',cartController.deletecart)
+ router.delete('/cartdel/:id',cartController.deleteallcart)
+ router.get('/inccart/:id',cartController.incCartQuantity)
+ router.get('/deccart/:id',cartController.decQuantity)
+ router.post('/addorder',orderController.addOrders)
+ router.get('/orderlist',orderController.orderList)
 
 
 

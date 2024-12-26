@@ -16,15 +16,18 @@ const cartSchema=new mongoose.Schema({
         type:String,
         // required:true 
     },
+    food_image:{
+        type:String
+    },
     total:{
         type:String,
         // required:true
     },
-    userId:{
+    uid:{
         type:String,
         // required:true
     },
-    itemId:{
+    pid:{
         
             type:String,
             // required:true
@@ -33,5 +36,5 @@ const cartSchema=new mongoose.Schema({
 
 })
 
-const cartitems=mongoose.model('cartitems',cartSchema)
-module.exports=cartitems
+const carts=mongoose.model('carts',cartSchema)
+module.exports=carts
